@@ -1,0 +1,108 @@
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { Button } from "semantic-ui-react";
+import { Link } from "react-router-dom";
+import styled from "@emotion/styled";
+
+const CardContainer = styled.div`
+  margin: auto;
+  width: 70%;
+  border: solid #00ff80 1px;
+  padding: 10px 20px 10px 20px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+`;
+
+const Flex = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+//TODO: check why is avatar different from the Leaderboard
+const Avatar = styled.img`
+  height: 80px;
+`;
+
+class QuestionCard extends Component {
+
+  render() {
+    const { name, avatarURL, questionTeaser, toBeAnswered, id } = this.props;
+
+    const button = toBeAnswered ? (
+      <Link
+        to={{
+          pathname: `/question/${id}`,
+          state: { showResponse: false }
+        }}
+        style={{ width: `100%` }}
+      >
+        <Button floated="right" basic color="green">
+          View Poll
+        </Button>
+      </Link>
+    ) : (
+        <Link
+          to={{
+            pathname: `/question/${id}`,
+            state: { showResponse: true }
+          }}
+          style={{ width: `100%` }}
+        >
+          <Button floated="right" basic color="green">
+            View Poll
+        </Button>
+        </Link>
+      );
+
+    return (
+      <CardContainer>
+        <Flex
+          style={{
+            flex: `1 1 160px`,
+            backgroundColor: `#00ff80`,
+            padding: `25px`,
+            borderRadius: `5px`
+          }}
+        >
+          <Avatar src={avatarURL} alt={name} />
+          <h4 style={{ margin: `none` }}>{name}</h4>
+        </Flex>
+        <Flex
+          style={{
+            alignItems: `baseline`,
+            flex: `2 1 300px`,
+            margin: `20px 0px 0px 10px`
+          }}
+        >
+          <h2 style={{ color: `#ff0000`, fontStyle: `bold` }}>
+            Would you rather...{" "}
+          </h2>
+          <p style={{ margin: `0px` }}>{questionTeaser}</p>
+          <h4 style={{ margin: `0px` }}>or</h4>
+          <p style={{ margin: `0px` }}>...</p>
+          <br />
+          {button}
+        </Flex>
+      </CardContainer>
+    );
+  }
+}
+
+function mapStateToProps({ users, questions }, { id }) {
+  const question = questions[id];
+  const avatarURL = users[question.author].avatarURL;
+  const name = users[question.author].name;
+
+  return {
+    avatarURL,
+    name,
+    questionTeaser: question.optionOne.text
+  };
+}
+
+export default connect(mapStateToProps)(QuestionCard);
